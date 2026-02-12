@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>VIP Mystery Box</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@600;800;1000&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#121125;
+      --accent:#ff75e2;
+      --text:#f6f6ff;
+      --stroke: rgba(255,255,255,.12);
+      --shadow: 0 26px 70px rgba(0,0,0,.55);
+    }
+
+    *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+    html,body{ height:100%; margin:0; overflow: hidden; touch-action: manipulation; }
+    body{
+      font-family: Inter, sans-serif;
+      color:var(--text);
+      background: radial-gradient(950px 520px at 50% -10%, rgba(255,117,226,.22), transparent 60%), linear-gradient(180deg, var(--bg), var(--bg));
+      display:flex; align-items:center; justify-content:center;
+    }
+
+    .wrap{
+      width:min(500px, 95%);
+      border-radius: 34px;
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
+      padding: 40px 20px;
+      text-align: center;
+      position: relative;
+      transition: transform 0.1s ease;
+    }
+
+    h1{
+      font-family: Orbitron; font-size: 28px; margin: 10px 0;
+      background: linear-gradient(180deg, #fff, var(--accent));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+
+    .box-container {
+      position: relative;
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .boxImage {
+      width: 220px;
+      transition: transform 0.05s ease-out;
+      filter: drop-shadow(0 0 15px rgba(255,117,226,0.3));
+    }
+
+    /* TAP EFFECTS */
+    .tap-hit {
+      animation: tapHit 0.1s ease-out;
+    }
+
+    @keyframes tapHit {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+
+    .shake {
+      animation: boxShake 0.3s ease-in-out;
+    }
+
+    @keyframes boxShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-10px) rotate(-2deg); }
+      40% { transform: translateX(10px) rotate(2deg); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+
+    /* EXPLOSION EFFECT */
+    .explode {
+      animation: boxExplode 0.6s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards;
+    }
+
+    @keyframes boxExplode {
+      0% { transform: scale(1); filter: brightness(1); }
+      30% { transform: scale(1.4); filter: brightness(3) blur(2px); opacity: 0.8; }
+      100% { transform: scale(3); filter: brightness(10) blur(20px); opacity: 0; }
+    }
+
+    /* SCREEN SHAKE */
+    .screen-boom {
+      animation: screenBoom 0.4s ease-out;
+    }
+    @keyframes screenBoom {
+      0% { transform: scale(1); }
+      10% { transform: scale(1.02) translateY(-5px); }
+      100% { transform: scale(1); }
+    }
+
+    .tap-hint {
+      margin-top: 15px; font-weight: 900; font-size: 14px;
+      letter-spacing: 2px; color: var(--accent);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* MODAL */
+    #overlay{
+      display:none; position:fixed; inset:0;
+      background: rgba(0,0,0,.9); backdrop-filter: blur(15px);
+      z-index: 100; align-items: center; justify-content: center;
+    }
+    .modal {
+      background: white; color: #111; padding: 40px 30px;
+      border-radius: 30px; text-align: center; width: 90%; max-width: 400px;
+      transform: scale(0.8); animation: modalIn 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards;
+    }
+    @keyframes modalIn { to { transform: scale(1); } }
+
+    .bigPrize { font-family: Orbitron; font-size: 26px; color: #d42bb2; margin: 15px 0; font-weight: 900; }
+    .codeBox { background: #f0f0f0; border: 2px dashed #ccc; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .code { font-family: monospace; font-size: 18px; font-weight: 900; letter-spacing: 1px; }
+    .copyBtn { background: #111; color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 12px; }
+    .redeem-note { font-size: 12px; color: #666; font-weight: 600; line-height: 1.5; }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="wrap" id="mainWrap">
+    <header>
+      <h1>VIP MYSTERY BOX</h1>
+      <div class="tap-hint" id="hintText">TAP REPEATEDLY TO BREAK</div>
+    </header>
+
+    <div class="box-container" onpointerdown="handleTap(event)">
+      <img id="mainBox" class="boxImage" src="https://ricomx.ft-crm.com/media-api/serve/df6b594c-e8bd-402d-b186-efca9501a635_2.png" alt="Box">
+    </div>
+  </div>
+
+  <div id="overlay">
+    <div class="modal">
+      <h2 style="margin:0; font-size: 14px; opacity: 0.5; letter-spacing: 2px;">SUCCESSFULLY UNLOCKED</h2>
+      <div class="bigPrize" id="prizeText">×10 FREE SPINS</div>
+      
+      <div class="codeBox">
+        <div class="code" id="codeText">VIP777</div>
+        <button class="copyBtn" onclick="copyCode()">COPY</button>
+      </div>
+
+      <div class="redeem-note">Copy the code and redeem in bonus code section</div>
+    </div>
+  </div>
+
+  <audio id="tapSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
+  <audio id="breakSound" src="https://assets.mixkit.co/active_storage/sfx/2857/2857-preview.mp3" preload="auto"></audio>
+
+  <script>
+    let taps = 0;
+    const requiredTaps = 10; 
+    let isBroken = false;
+
+    const box = document.getElementById("mainBox");
+    const wrap = document.getElementById("mainWrap");
+    const hintText = document.getElementById("hintText");
+    const tapSound = document.getElementById("tapSound");
+    const breakSound = document.getElementById("breakSound");
+    const overlay = document.getElementById("overlay");
+
+    function handleTap(e) {
+      if (isBroken) return;
+      
+      // Prevent zooming on mobile
+      if(e) e.preventDefault();
+
+      taps++;
+      
+      // Play sound
+      tapSound.currentTime = 0;
+      tapSound.play().catch(()=>{});
+
+      // Reset animations
+      box.classList.remove("tap-hit", "shake");
+      void box.offsetWidth; 
+
+      // On final taps, make it shake more violently
+      if (taps > (requiredTaps * 0.7)) {
+        box.classList.add("shake");
+      } else {
+        box.classList.add("tap-hit");
+      }
+
+      if (taps >= requiredTaps) {
+        breakBox();
+      }
+    }
+
+    function breakBox() {
+      isBroken = true;
+      hintText.style.opacity = "0";
+      
+      // Screen shake effect
+      wrap.classList.add("screen-boom");
+      
+      // Break sound
+      breakSound.play().catch(()=>{});
+      
+      // Explode visual
+      box.classList.add("explode");
+
+      setTimeout(() => {
+        confetti({
+          particleCount: 250,
+          spread: 100,
+          origin: { y: 0.5 },
+          colors: ["#ff75e2", "#ffffff", "#00ffaa", "#ffcf4b"]
+        });
+        revealReward();
+      }, 400);
+    }
+
+    function revealReward() {
+      const rewards = ["×5 FREE SPINS", "×10 FREE SPINS", "×20 FREE SPINS", "×50 FREE SPINS"];
+      const reward = rewards[Math.floor(Math.random() * rewards.length)];
+      
+      document.getElementById("prizeText").innerText = reward;
+      document.getElementById("codeText").innerText = "VIP" + Math.floor(1000 + Math.random() * 9000);
+      
+      overlay.style.display = "flex";
+    }
+
+    function copyCode() {
+      const code = document.getElementById("codeText").innerText;
+      navigator.clipboard.writeText(code).then(() => {
+          const btn = document.querySelector('.copyBtn');
+          btn.innerText = "COPIED!";
+          btn.style.background = "#d42bb2";
+          setTimeout(() => {
+              btn.innerText = "COPY";
+              btn.style.background = "#111";
+          }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
