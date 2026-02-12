@@ -216,9 +216,10 @@
   <audio id="chargeLoop" src="https://assets.mixkit.co/active_storage/sfx/2590/2590-preview.mp3" preload="auto"></audio>
 
   <script>
-    const LS_KEY = "vip_energy_mission2_claim_v2";
-    const VOUCHER_CODES = ["XP-992-VIP", "PLASMA-77", "ENERGY-V2"];
-    
+    // ===== LOCK + RANDOM CODE (ONE PLAY ONLY) =====
+    const LS_KEY = "vip_energy_mission2_claim_v2"; // keep this unique for Mission 2
+    const VOUCHER_CODES = ["a22waF", "VdpSVD", "WzGekS"];
+
     let charge = 0;
     let charging = false;
     let timer = null;
@@ -230,37 +231,51 @@
     const instruction = document.getElementById("instruction");
     const statusText = document.getElementById("statusText");
     const chargeLoop = document.getElementById("chargeLoop");
+    const overlay = document.getElementById("overlay");
+    const codeText = document.getElementById("codeText");
 
-    // Check if already claimed
-    if (localStorage.getItem(LS_KEY)) {
+    // If already claimed on this device/browser, lock it immediately
+    const claimedCode = localStorage.getItem(LS_KEY);
+    if (claimedCode) {
       hasUnlocked = true;
       panel.classList.add("disabled");
-      instruction.textContent = "CORE ALREADY DEPLETED";
+      instruction.textContent = "ALREADY CLAIMED ON THIS DEVICE";
+      statusText.textContent = "";
+      // Optional: show the claimed code immediately (comment out if you don't want)
+      // codeText.textContent = claimedCode;
+      // overlay.style.display = "flex";
     }
 
     function startCharge(e) {
-      if (hasUnlocked) return;
+      if (e) e.preventDefault();
+      if (hasUnlocked || localStorage.getItem(LS_KEY)) return;
+
       charging = true;
       panel.classList.add("charging");
       instruction.textContent = "STABILIZING VOLTAGE...";
-      
-      try { chargeLoop.play(); chargeLoop.loop = true; } catch(e) {}
+
+      try { chargeLoop.currentTime = 0; chargeLoop.play(); chargeLoop.loop = true; } catch(err) {}
 
       if (!timer) {
         timer = setInterval(() => {
           if (!charging) return;
+
           charge = Math.min(100, charge + 1.8);
           render();
+
           if (charge >= 100) unlock();
         }, 50);
       }
     }
 
-    function stopCharge() {
-      if (hasUnlocked) return;
+    function stopCharge(e) {
+      if (e) e.preventDefault();
+      if (hasUnlocked || localStorage.getItem(LS_KEY)) return;
+
       charging = false;
       panel.classList.remove("charging", "high-power");
-      try { chargeLoop.pause(); chargeLoop.currentTime = 0; } catch(e) {}
+
+      try { chargeLoop.pause(); chargeLoop.currentTime = 0; } catch(err) {}
 
       if (charge < 100) {
         charge = 0;
@@ -273,29 +288,59 @@
       const val = Math.round(charge);
       pctText.textContent = val + "%";
       barFill.style.width = charge + "%";
-      
-      // Intense Shake Effect
-      if (charge > 75 && charging) {
-        panel.classList.add("high-power");
-      }
+
+      if (charge > 75 && charging) panel.classList.add("high-power");
+      else panel.classList.remove("high-power");
     }
 
     function unlock() {
+      if (hasUnlocked) return;
+
       hasUnlocked = true;
+      charging = false;
+
       clearInterval(timer);
+      timer = null;
+
       panel.classList.remove("charging", "high-power");
-      
-      const code = VOUCHER_CODES[Math.floor(Math.random() * VOUCHER_CODES.length)];
-      document.getElementById("codeText").textContent = code;
-      localStorage.setItem(LS_KEY, code);
+
+      try { chargeLoop.pause(); chargeLoop.currentTime = 0; } catch(err) {}
+
+      // Pick 1 of 3 codes and store it so this device can only play once
+      const code = pickVoucherCode();
+      codeText.textContent = code;
 
       confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-      document.getElementById("overlay").style.display = "flex";
+
+      overlay.style.display = "flex";
+      panel.classList.add("disabled");
+      instruction.textContent = "ALREADY CLAIMED ON THIS DEVICE";
+    }
+
+    function pickVoucherCode() {
+      const existing = localStorage.getItem(LS_KEY);
+      if (existing) return existing;
+
+      const code = VOUCHER_CODES[Math.floor(Math.random() * VOUCHER_CODES.length)];
+      localStorage.setItem(LS_KEY, code);
+      return code;
     }
 
     function copyCode() {
-      const txt = document.getElementById("codeText").innerText;
+      const txt = codeText.innerText;
       navigator.clipboard.writeText(txt).then(() => {
+        const btn = document.querySelector(".copyBtn");
+        btn.innerText = "COPIED!";
+        setTimeout(() => btn.innerText = "COPY", 2000);
+      }).catch(() => {
+        // fallback
+        const ta = document.createElement("textarea");
+        ta.value = txt;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch(e){}
+        document.body.removeChild(ta);
+
         const btn = document.querySelector(".copyBtn");
         btn.innerText = "COPIED!";
         setTimeout(() => btn.innerText = "COPY", 2000);
