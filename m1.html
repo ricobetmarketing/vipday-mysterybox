@@ -63,20 +63,14 @@
     }
 
     /* TAP EFFECTS */
-    .tap-hit {
-      animation: tapHit 0.1s ease-out;
-    }
-
+    .tap-hit { animation: tapHit 0.1s ease-out; }
     @keyframes tapHit {
       0% { transform: scale(1); }
       50% { transform: scale(0.9); }
       100% { transform: scale(1); }
     }
 
-    .shake {
-      animation: boxShake 0.3s ease-in-out;
-    }
-
+    .shake { animation: boxShake 0.3s ease-in-out; }
     @keyframes boxShake {
       0%, 100% { transform: translateX(0); }
       20% { transform: translateX(-10px) rotate(-2deg); }
@@ -89,7 +83,6 @@
     .explode {
       animation: boxExplode 0.6s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards;
     }
-
     @keyframes boxExplode {
       0% { transform: scale(1); filter: brightness(1); }
       30% { transform: scale(1.4); filter: brightness(3) blur(2px); opacity: 0.8; }
@@ -97,9 +90,7 @@
     }
 
     /* SCREEN SHAKE */
-    .screen-boom {
-      animation: screenBoom 0.4s ease-out;
-    }
+    .screen-boom { animation: screenBoom 0.4s ease-out; }
     @keyframes screenBoom {
       0% { transform: scale(1); }
       10% { transform: scale(1.02) translateY(-5px); }
@@ -111,7 +102,6 @@
       letter-spacing: 2px; color: var(--accent);
       animation: pulse 1.5s infinite;
     }
-
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
     /* MODAL */
@@ -123,16 +113,63 @@
     .modal {
       background: white; color: #111; padding: 40px 30px;
       border-radius: 30px; text-align: center; width: 90%; max-width: 400px;
-      transform: scale(0.8); animation: modalIn 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards;
+      transform: scale(0.8);
+      animation: modalIn 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards;
     }
     @keyframes modalIn { to { transform: scale(1); } }
 
-    .bigPrize { font-family: Orbitron; font-size: 26px; color: #d42bb2; margin: 15px 0; font-weight: 900; }
-    .codeBox { background: #f0f0f0; border: 2px dashed #ccc; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .code { font-family: monospace; font-size: 18px; font-weight: 900; letter-spacing: 1px; }
-    .copyBtn { background: #111; color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 12px; }
-    .redeem-note { font-size: 12px; color: #666; font-weight: 600; line-height: 1.5; }
+    .bigPrize {
+      font-family: Orbitron;
+      font-size: 22px;
+      color: #d42bb2;
+      margin: 15px 0 10px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
 
+    .codeBox {
+      background: #f0f0f0;
+      border: 2px dashed #ccc;
+      padding: 15px;
+      border-radius: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 18px; font-weight: 900; letter-spacing: 1px; }
+    .copyBtn { background: #111; color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 12px; white-space: nowrap; }
+    .redeem-note { font-size: 12px; color: #666; font-weight: 700; line-height: 1.5; }
+
+    /* LOCKED STATE */
+    .lockedTag{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.85);
+      font-weight: 900;
+      letter-spacing: 1.4px;
+      font-size: 12px;
+    }
+    .lockedSub{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(255,255,255,.75);
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .disabledArea{
+      pointer-events:none;
+      opacity:.55;
+      filter: grayscale(.25);
+    }
   </style>
 </head>
 
@@ -142,9 +179,11 @@
     <header>
       <h1>VIP MYSTERY BOX</h1>
       <div class="tap-hint" id="hintText">TAP REPEATEDLY TO BREAK</div>
+      <div class="lockedTag" id="lockedTag" style="display:none;">🔒 ALREADY CLAIMED</div>
+      <div class="lockedSub" id="lockedSub" style="display:none;">This device has already unlocked a code.</div>
     </header>
 
-    <div class="box-container" onpointerdown="handleTap(event)">
+    <div class="box-container" id="boxArea" onpointerdown="handleTap(event)">
       <img id="mainBox" class="boxImage" src="https://ricomx.ft-crm.com/media-api/serve/df6b594c-e8bd-402d-b186-efca9501a635_2.png" alt="Box">
     </div>
   </div>
@@ -152,14 +191,15 @@
   <div id="overlay">
     <div class="modal">
       <h2 style="margin:0; font-size: 14px; opacity: 0.5; letter-spacing: 2px;">SUCCESSFULLY UNLOCKED</h2>
-      <div class="bigPrize" id="prizeText">×10 FREE SPINS</div>
-      
+
+      <div class="bigPrize">YOUR BONUS CODE</div>
+
       <div class="codeBox">
-        <div class="code" id="codeText">VIP777</div>
+        <div class="code" id="codeText">-----</div>
         <button class="copyBtn" onclick="copyCode()">COPY</button>
       </div>
 
-      <div class="redeem-note">Copy the code and redeem in bonus code section</div>
+      <div class="redeem-note">Redeem now in the <b>Bonus Code</b> section to unlock your prize.</div>
     </div>
   </div>
 
@@ -167,32 +207,63 @@
   <audio id="breakSound" src="https://assets.mixkit.co/active_storage/sfx/2857/2857-preview.mp3" preload="auto"></audio>
 
   <script>
+    // ====== ONE-CLAIM LOCK (localStorage) ======
+    const LS_KEY = "vip_mystery_box_claim_v1"; // change this key if you ever want to reset for everyone
+
+    // Your 3 fixed voucher codes:
+    const VOUCHER_CODES = ["2JPaeP", "mv2u39", "tr1sAu"];
+
     let taps = 0;
-    const requiredTaps = 10; 
+    const requiredTaps = 10;
     let isBroken = false;
 
     const box = document.getElementById("mainBox");
     const wrap = document.getElementById("mainWrap");
+    const boxArea = document.getElementById("boxArea");
     const hintText = document.getElementById("hintText");
+    const lockedTag = document.getElementById("lockedTag");
+    const lockedSub = document.getElementById("lockedSub");
+
     const tapSound = document.getElementById("tapSound");
     const breakSound = document.getElementById("breakSound");
     const overlay = document.getElementById("overlay");
 
+    // If already claimed on this device/browser, lock it immediately
+    initLockState();
+
+    function initLockState(){
+      const claimed = localStorage.getItem(LS_KEY);
+      if (claimed) {
+        lockUI();
+      }
+    }
+
+    function lockUI(){
+      isBroken = true; // stops tapping
+      hintText.style.display = "none";
+      lockedTag.style.display = "inline-flex";
+      lockedSub.style.display = "block";
+      boxArea.classList.add("disabledArea");
+    }
+
     function handleTap(e) {
-      if (isBroken) return;
-      
       // Prevent zooming on mobile
       if(e) e.preventDefault();
 
+      // Hard block if already claimed
+      if (isBroken || localStorage.getItem(LS_KEY)) return;
+
       taps++;
-      
+
       // Play sound
-      tapSound.currentTime = 0;
-      tapSound.play().catch(()=>{});
+      try{
+        tapSound.currentTime = 0;
+        tapSound.play();
+      }catch(_){}
 
       // Reset animations
       box.classList.remove("tap-hit", "shake");
-      void box.offsetWidth; 
+      void box.offsetWidth;
 
       // On final taps, make it shake more violently
       if (taps > (requiredTaps * 0.7)) {
@@ -207,37 +278,57 @@
     }
 
     function breakBox() {
+      // Double-check lock before breaking
+      if (localStorage.getItem(LS_KEY)) {
+        lockUI();
+        return;
+      }
+
       isBroken = true;
       hintText.style.opacity = "0";
-      
+
       // Screen shake effect
       wrap.classList.add("screen-boom");
-      
+
       // Break sound
-      breakSound.play().catch(()=>{});
-      
+      try{ breakSound.play(); }catch(_){}
+
       // Explode visual
       box.classList.add("explode");
 
       setTimeout(() => {
         confetti({
-          particleCount: 250,
-          spread: 100,
-          origin: { y: 0.5 },
+          particleCount: 220,
+          spread: 95,
+          origin: { y: 0.55 },
           colors: ["#ff75e2", "#ffffff", "#00ffaa", "#ffcf4b"]
         });
         revealReward();
       }, 400);
     }
 
+    function pickVoucherCode() {
+      // If a code was already assigned on this device, reuse it
+      const existing = localStorage.getItem(LS_KEY);
+      if (existing) return existing;
+
+      // Pick 1 of 3 codes randomly
+      const code = VOUCHER_CODES[Math.floor(Math.random() * VOUCHER_CODES.length)];
+
+      // Lock it in localStorage so this device can only "spin" once
+      localStorage.setItem(LS_KEY, code);
+
+      return code;
+    }
+
     function revealReward() {
-      const rewards = ["×5 FREE SPINS", "×10 FREE SPINS", "×20 FREE SPINS", "×50 FREE SPINS"];
-      const reward = rewards[Math.floor(Math.random() * rewards.length)];
-      
-      document.getElementById("prizeText").innerText = reward;
-      document.getElementById("codeText").innerText = "VIP" + Math.floor(1000 + Math.random() * 9000);
-      
+      const code = pickVoucherCode();
+      document.getElementById("codeText").innerText = code;
+
       overlay.style.display = "flex";
+
+      // After reveal, lock the UI behind it too
+      setTimeout(lockUI, 50);
     }
 
     function copyCode() {
@@ -250,6 +341,21 @@
               btn.innerText = "COPY";
               btn.style.background = "#111";
           }, 2000);
+      }).catch(() => {
+        // fallback (older browsers)
+        const ta = document.createElement("textarea");
+        ta.value = code;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch(e){}
+        document.body.removeChild(ta);
+        const btn = document.querySelector('.copyBtn');
+        btn.innerText = "COPIED!";
+        btn.style.background = "#d42bb2";
+        setTimeout(() => {
+            btn.innerText = "COPY";
+            btn.style.background = "#111";
+        }, 2000);
       });
     }
   </script>
