@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>VIP Energy Charge – High Fidelity</title>
+  <title>Carga de Energía VIP – Alta Fidelidad</title>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -167,14 +167,14 @@
 <body>
 
   <div class="wrap" id="mainWrap">
-    <div class="topBadge"><span class="dot"></span> VIP SYSTEM ACTIVE</div>
+    <div class="topBadge"><span class="dot"></span> SISTEMA VIP ACTIVO</div>
 
-    <h1>ENERGY CHARGE</h1>
-    <p class="sub">Hold the trigger to harness the plasma core.<br/>Reach <b>100%</b> to extract your reward.</p>
+    <h1>CARGA DE ENERGÍA</h1>
+    <p class="sub">Mantén presionado el gatillo para aprovechar el núcleo de plasma.<br/>Alcanza <b>100%</b> para obtener tu recompensa.</p>
 
     <div class="panel" id="panel">
       <div class="hud">
-        <div class="label">Reactor Core</div>
+        <div class="label">Núcleo del Reactor</div>
         <div class="pct" id="pctText">0%</div>
       </div>
 
@@ -183,7 +183,7 @@
         <div class="barFill" id="barFill"></div>
       </div>
 
-      <div class="instructions" id="instruction">Ready for ignition</div>
+      <div class="instructions" id="instruction">Listo para la ignición</div>
 
       <button 
         class="chargeBtn" 
@@ -193,8 +193,8 @@
         onpointercancel="stopCharge(event)"
         onpointerleave="stopCharge(event)"
       >
-        INITIATE CHARGE
-        <small>HOLD TO MAINTAIN VOLTAGE</small>
+        INICIAR CARGA
+        <small>MANTÉN PRESIONADO PARA MANTENER EL VOLTAJE</small>
       </button>
 
       <div id="statusText" style="font-size: 11px; margin-top: 15px; opacity: 0.5;"></div>
@@ -203,13 +203,13 @@
 
   <div id="overlay">
     <div class="modal">
-      <div style="font-size: 10px; font-weight: 900; letter-spacing: 2px; opacity: 0.5;">REACTION COMPLETE</div>
-      <div class="bigPrize">MISSION 2 CLEAR</div>
+      <div style="font-size: 10px; font-weight: 900; letter-spacing: 2px; opacity: 0.5;">REACCIÓN COMPLETADA</div>
+      <div class="bigPrize">MISIÓN 2 COMPLETADA</div>
       <div class="codeBox">
         <div style="font-family: monospace; font-size: 20px; font-weight: 900;" id="codeText">-----</div>
-        <button class="copyBtn" onclick="copyCode()">COPY</button>
+        <button class="copyBtn" onclick="copyCode()">COPIAR</button>
       </div>
-      <p style="font-size: 12px; margin-top: 15px; font-weight: 600; color: #666;">Redeem in the <b>Bonus Code</b> section instantly.</p>
+      <p style="font-size: 12px; margin-top: 15px; font-weight: 600; color: #666;">Canjea al instante en la sección de <b>Código de Bono</b>.</p>
     </div>
   </div>
 
@@ -239,7 +239,7 @@
     if (claimedCode) {
       hasUnlocked = true;
       panel.classList.add("disabled");
-      instruction.textContent = "ALREADY CLAIMED ON THIS DEVICE";
+      instruction.textContent = "YA RECLAMADO EN ESTE DISPOSITIVO";
       statusText.textContent = "";
       // Optional: show the claimed code immediately (comment out if you don't want)
       // codeText.textContent = claimedCode;
@@ -252,7 +252,7 @@
 
       charging = true;
       panel.classList.add("charging");
-      instruction.textContent = "STABILIZING VOLTAGE...";
+      instruction.textContent = "ESTABILIZANDO VOLTAJE...";
 
       try { chargeLoop.currentTime = 0; chargeLoop.play(); chargeLoop.loop = true; } catch(err) {}
 
@@ -280,7 +280,7 @@
       if (charge < 100) {
         charge = 0;
         render();
-        instruction.textContent = "VOLTAGE LOST - RETRY";
+        instruction.textContent = "VOLTAJE PERDIDO - INTENTA DE NUEVO";
       }
     }
 
@@ -314,7 +314,7 @@
 
       overlay.style.display = "flex";
       panel.classList.add("disabled");
-      instruction.textContent = "ALREADY CLAIMED ON THIS DEVICE";
+      instruction.textContent = "YA RECLAMADO EN ESTE DISPOSITIVO";
     }
 
     function pickVoucherCode() {
@@ -330,8 +330,8 @@
       const txt = codeText.innerText;
       navigator.clipboard.writeText(txt).then(() => {
         const btn = document.querySelector(".copyBtn");
-        btn.innerText = "COPIED!";
-        setTimeout(() => btn.innerText = "COPY", 2000);
+        btn.innerText = "¡COPIADO!";
+        setTimeout(() => btn.innerText = "COPIAR", 2000);
       }).catch(() => {
         // fallback
         const ta = document.createElement("textarea");
@@ -342,8 +342,8 @@
         document.body.removeChild(ta);
 
         const btn = document.querySelector(".copyBtn");
-        btn.innerText = "COPIED!";
-        setTimeout(() => btn.innerText = "COPY", 2000);
+        btn.innerText = "¡COPIADO!";
+        setTimeout(() => btn.innerText = "COPIAR", 2000);
       });
     }
   </script>
