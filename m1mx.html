@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>VIP Mystery Box</title>
+  <title>Caja Misteriosa VIP</title>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -177,29 +177,29 @@
 
   <div class="wrap" id="mainWrap">
     <header>
-      <h1>VIP MYSTERY BOX</h1>
-      <div class="tap-hint" id="hintText">TAP REPEATEDLY TO BREAK</div>
-      <div class="lockedTag" id="lockedTag" style="display:none;">🔒 ALREADY CLAIMED</div>
-      <div class="lockedSub" id="lockedSub" style="display:none;">This device has already unlocked a code.</div>
+      <h1>CAJA MISTERIOSA VIP</h1>
+      <div class="tap-hint" id="hintText">TOCA REPETIDAMENTE PARA ROMPERLA</div>
+      <div class="lockedTag" id="lockedTag" style="display:none;">🔒 YA RECLAMADO</div>
+      <div class="lockedSub" id="lockedSub" style="display:none;">Este dispositivo ya ha desbloqueado un código.</div>
     </header>
 
     <div class="box-container" id="boxArea" onpointerdown="handleTap(event)">
-      <img id="mainBox" class="boxImage" src="https://ricomx.ft-crm.com/media-api/serve/df6b594c-e8bd-402d-b186-efca9501a635_2.png" alt="Box">
+      <img id="mainBox" class="boxImage" src="https://ricomx.ft-crm.com/media-api/serve/df6b594c-e8bd-402d-b186-efca9501a635_2.png" alt="Caja">
     </div>
   </div>
 
   <div id="overlay">
     <div class="modal">
-      <h2 style="margin:0; font-size: 14px; opacity: 0.5; letter-spacing: 2px;">SUCCESSFULLY UNLOCKED</h2>
+      <h2 style="margin:0; font-size: 14px; opacity: 0.5; letter-spacing: 2px;">DESBLOQUEADO CON ÉXITO</h2>
 
-      <div class="bigPrize">YOUR BONUS CODE</div>
+      <div class="bigPrize">TU CÓDIGO DE BONO</div>
 
       <div class="codeBox">
         <div class="code" id="codeText">-----</div>
-        <button class="copyBtn" onclick="copyCode()">COPY</button>
+        <button class="copyBtn" onclick="copyCode()">COPIAR</button>
       </div>
 
-      <div class="redeem-note">Redeem now in the <b>Bonus Code</b> section to unlock your prize.</div>
+      <div class="redeem-note">Canjea ahora en la sección de <b>Código de Bono</b> para desbloquear tu premio.</div>
     </div>
   </div>
 
@@ -335,10 +335,10 @@
       const code = document.getElementById("codeText").innerText;
       navigator.clipboard.writeText(code).then(() => {
           const btn = document.querySelector('.copyBtn');
-          btn.innerText = "COPIED!";
+          btn.innerText = "¡COPIADO!";
           btn.style.background = "#d42bb2";
           setTimeout(() => {
-              btn.innerText = "COPY";
+              btn.innerText = "COPIAR";
               btn.style.background = "#111";
           }, 2000);
       }).catch(() => {
@@ -350,10 +350,10 @@
         try { document.execCommand("copy"); } catch(e){}
         document.body.removeChild(ta);
         const btn = document.querySelector('.copyBtn');
-        btn.innerText = "COPIED!";
+        btn.innerText = "¡COPIADO!";
         btn.style.background = "#d42bb2";
         setTimeout(() => {
-            btn.innerText = "COPY";
+            btn.innerText = "COPIAR";
             btn.style.background = "#111";
         }, 2000);
       });
