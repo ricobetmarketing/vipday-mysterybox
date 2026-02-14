@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>VIP Mystery Box</title>
+  <title>Caixa Misteriosa VIP</title>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,7 +62,6 @@
       filter: drop-shadow(0 0 15px rgba(255,117,226,0.3));
     }
 
-    /* TAP EFFECTS */
     .tap-hit { animation: tapHit 0.1s ease-out; }
     @keyframes tapHit {
       0% { transform: scale(1); }
@@ -79,7 +78,6 @@
       80% { transform: translateX(5px); }
     }
 
-    /* EXPLOSION EFFECT */
     .explode {
       animation: boxExplode 0.6s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards;
     }
@@ -89,7 +87,6 @@
       100% { transform: scale(3); filter: brightness(10) blur(20px); opacity: 0; }
     }
 
-    /* SCREEN SHAKE */
     .screen-boom { animation: screenBoom 0.4s ease-out; }
     @keyframes screenBoom {
       0% { transform: scale(1); }
@@ -104,7 +101,6 @@
     }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-    /* MODAL */
     #overlay{
       display:none; position:fixed; inset:0;
       background: rgba(0,0,0,.9); backdrop-filter: blur(15px);
@@ -142,7 +138,6 @@
     .copyBtn { background: #111; color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 12px; white-space: nowrap; }
     .redeem-note { font-size: 12px; color: #666; font-weight: 700; line-height: 1.5; }
 
-    /* LOCKED STATE */
     .lockedTag{
       display:inline-flex;
       align-items:center;
@@ -177,29 +172,29 @@
 
   <div class="wrap" id="mainWrap">
     <header>
-      <h1>VIP MYSTERY BOX</h1>
-      <div class="tap-hint" id="hintText">TAP REPEATEDLY TO BREAK</div>
-      <div class="lockedTag" id="lockedTag" style="display:none;">🔒 ALREADY CLAIMED</div>
-      <div class="lockedSub" id="lockedSub" style="display:none;">This device has already unlocked a code.</div>
+      <h1>CAIXA MISTERIOSA VIP</h1>
+      <div class="tap-hint" id="hintText">TOQUE REPETIDAMENTE PARA QUEBRAR</div>
+      <div class="lockedTag" id="lockedTag" style="display:none;">🔒 JÁ RESGATADO</div>
+      <div class="lockedSub" id="lockedSub" style="display:none;">Este dispositivo já desbloqueou um código.</div>
     </header>
 
     <div class="box-container" id="boxArea" onpointerdown="handleTap(event)">
-      <img id="mainBox" class="boxImage" src="https://ricomx.ft-crm.com/media-api/serve/df6b594c-e8bd-402d-b186-efca9501a635_2.png" alt="Box">
+      <img id="mainBox" class="boxImage" src="https://ricomx.ft-crm.com/media-api/serve/df6b594c-e8bd-402d-b186-efca9501a635_2.png" alt="Caixa">
     </div>
   </div>
 
   <div id="overlay">
     <div class="modal">
-      <h2 style="margin:0; font-size: 14px; opacity: 0.5; letter-spacing: 2px;">SUCCESSFULLY UNLOCKED</h2>
+      <h2 style="margin:0; font-size: 14px; opacity: 0.5; letter-spacing: 2px;">DESBLOQUEADO COM SUCESSO</h2>
 
-      <div class="bigPrize">YOUR BONUS CODE</div>
+      <div class="bigPrize">SEU CÓDIGO DE BÔNUS</div>
 
       <div class="codeBox">
         <div class="code" id="codeText">-----</div>
-        <button class="copyBtn" onclick="copyCode()">COPY</button>
+        <button class="copyBtn" onclick="copyCode()">COPIAR</button>
       </div>
 
-      <div class="redeem-note">Redeem now in the <b>Bonus Code</b> section to unlock your prize.</div>
+      <div class="redeem-note">Resgate agora na seção <b>Código de Bônus</b> para desbloquear seu prêmio.</div>
     </div>
   </div>
 
@@ -207,10 +202,7 @@
   <audio id="breakSound" src="https://assets.mixkit.co/active_storage/sfx/2857/2857-preview.mp3" preload="auto"></audio>
 
   <script>
-    // ====== ONE-CLAIM LOCK (localStorage) ======
-    const LS_KEY = "vip_mystery_box_claim_v1"; // change this key if you ever want to reset for everyone
-
-    // Your 3 fixed voucher codes:
+    const LS_KEY = "vip_mystery_box_claim_v1";
     const VOUCHER_CODES = ["2JPaeP", "mv2u39", "tr1sAu"];
 
     let taps = 0;
@@ -228,7 +220,6 @@
     const breakSound = document.getElementById("breakSound");
     const overlay = document.getElementById("overlay");
 
-    // If already claimed on this device/browser, lock it immediately
     initLockState();
 
     function initLockState(){
@@ -239,7 +230,7 @@
     }
 
     function lockUI(){
-      isBroken = true; // stops tapping
+      isBroken = true;
       hintText.style.display = "none";
       lockedTag.style.display = "inline-flex";
       lockedSub.style.display = "block";
@@ -247,25 +238,19 @@
     }
 
     function handleTap(e) {
-      // Prevent zooming on mobile
       if(e) e.preventDefault();
-
-      // Hard block if already claimed
       if (isBroken || localStorage.getItem(LS_KEY)) return;
 
       taps++;
 
-      // Play sound
       try{
         tapSound.currentTime = 0;
         tapSound.play();
       }catch(_){}
 
-      // Reset animations
       box.classList.remove("tap-hit", "shake");
       void box.offsetWidth;
 
-      // On final taps, make it shake more violently
       if (taps > (requiredTaps * 0.7)) {
         box.classList.add("shake");
       } else {
@@ -278,7 +263,6 @@
     }
 
     function breakBox() {
-      // Double-check lock before breaking
       if (localStorage.getItem(LS_KEY)) {
         lockUI();
         return;
@@ -286,14 +270,10 @@
 
       isBroken = true;
       hintText.style.opacity = "0";
-
-      // Screen shake effect
       wrap.classList.add("screen-boom");
 
-      // Break sound
       try{ breakSound.play(); }catch(_){}
 
-      // Explode visual
       box.classList.add("explode");
 
       setTimeout(() => {
@@ -308,26 +288,18 @@
     }
 
     function pickVoucherCode() {
-      // If a code was already assigned on this device, reuse it
       const existing = localStorage.getItem(LS_KEY);
       if (existing) return existing;
 
-      // Pick 1 of 3 codes randomly
       const code = VOUCHER_CODES[Math.floor(Math.random() * VOUCHER_CODES.length)];
-
-      // Lock it in localStorage so this device can only "spin" once
       localStorage.setItem(LS_KEY, code);
-
       return code;
     }
 
     function revealReward() {
       const code = pickVoucherCode();
       document.getElementById("codeText").innerText = code;
-
       overlay.style.display = "flex";
-
-      // After reveal, lock the UI behind it too
       setTimeout(lockUI, 50);
     }
 
@@ -335,27 +307,12 @@
       const code = document.getElementById("codeText").innerText;
       navigator.clipboard.writeText(code).then(() => {
           const btn = document.querySelector('.copyBtn');
-          btn.innerText = "COPIED!";
+          btn.innerText = "COPIADO!";
           btn.style.background = "#d42bb2";
           setTimeout(() => {
-              btn.innerText = "COPY";
+              btn.innerText = "COPIAR";
               btn.style.background = "#111";
           }, 2000);
-      }).catch(() => {
-        // fallback (older browsers)
-        const ta = document.createElement("textarea");
-        ta.value = code;
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand("copy"); } catch(e){}
-        document.body.removeChild(ta);
-        const btn = document.querySelector('.copyBtn');
-        btn.innerText = "COPIED!";
-        btn.style.background = "#d42bb2";
-        setTimeout(() => {
-            btn.innerText = "COPY";
-            btn.style.background = "#111";
-        }, 2000);
       });
     }
   </script>
